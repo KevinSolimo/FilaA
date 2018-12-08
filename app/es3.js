@@ -1,9 +1,7 @@
-/*eslint-env node*/
-
 var express = require('express');
 var app = express();
 
-var countries = require('countryjs');
+var countries = require(__dirname + '/function/queryMongoDB.js');
 
 app.set('views', './views');
 app.set('view engine', 'pug');
@@ -23,11 +21,16 @@ app.get('/info', function (req, res) {
       // resetituisco, tra le altre cose, anche la capitale
       // countries.info(nazione, 'name') contiene tutte le info su quella nazione
       // .capital serve per prendere solo la capitale tra tute le informazioni
-      res.render('es3', {message: countries.info(nazione, 'name').capital, title:'capitale'});
+      countries.info(nazione, function(docs){
+        res.render('es3', {message: docs.capital, title:'capitale'});
+      });
   }
   else
   {
-      res.render('es3', {message: countries.info(nazione, 'name').population, title:'capitale'});
+      countries.info(nazione, function(docs){
+        res.render('es3', {message: docs.population, title:'capitale'});
+      });
+      
   }
   
 });
@@ -35,3 +38,4 @@ app.get('/info', function (req, res) {
 app.listen(3000, function () {
   console.log('Example app listening on port 3000!');
 });
+

@@ -1,36 +1,32 @@
-/*eslint-env node*/
-
 var express = require('express');
 var app = express();
 
-var countries = require('countryjs');
+var countries = require(__dirname + '/function/queryMongoDB.js');
 
 app.set('views', './views');
 app.set('view engine', 'pug');
 
 app.get('/', function (req, res) {
-  res.render('es6', {message: 'impariamo la geografia', title:'fila A', list: countries.all()});
-});
-
-app.get('/capital/:nazione', function (req, res) {
-  var nazione = req.params.nazione;
-  res.render('es7', {message: 'impariamo la geografia', title:'fila A', capitale: countries.capital(nazione, 'name')});
-});
-
-app.get('/states/:nazione', function (req, res) {
-  var nazione = req.params.nazione;
-  res.render('es8', {message: 'impariamo la geografia', title:'fila A', stati: countries.states(nazione, 'name')});
+    // restituisco tutte le infomrazioni sulle nazioni con countries.all()
+    countries.all(function(docs){
+        res.render('es4', {message: 'impariamo la geografia', title:'fila A', list: docs});
+    }); 
 });
 
 app.get('/info', function (req, res) {
   var nazione = req.query.nazione;
   var info = req.query.info;
   if (info == 'capitale' ) {
-      res.render('es3', {message: countries.info(nazione, 'name').capital, title:'capitale'});
+      countries.info(nazione, function(docs){
+        res.render('es3', {message: docs.capital, title:'capitale'});
+      });
   }
   else
   {
-      res.render('es3', {message: countries.info(nazione, 'name').population, title:'capitale'});
+      countries.info(nazione, function(docs){
+        res.render('es3', {message: docs.population, title:'capitale'});
+      });
+      
   }
   
 });
